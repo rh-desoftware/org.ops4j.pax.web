@@ -29,6 +29,7 @@
 
 	<groupId>org.ops4j.pax.web</groupId>
 	<artifactId>pax-web-api</artifactId>
+	<version>8.0.33.1-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 
 	<name>OPS4J Pax Web - API</name>
