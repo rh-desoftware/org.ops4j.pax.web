@@ -127,8 +127,9 @@ public class WebSocketModel extends ElementModel<Object, WebSocketEventData> {
             Object ws = getElementSupplier().get();
             if (ws != null) {
                 c = ws.getClass();
+                LOG.info("WebSocket endpoint class resolved from supplier: {}", c);
             } else {
-                throw new IllegalArgumentException("Can't determine the Web Socket endpoint path. Element supplier returned null.");
+                LOG.warn("Can't determine the Web Socket endpoint path. Element supplier returned null.");
             }
         } else if (getElementReference() != null) {
             Object ws = null;
@@ -137,8 +138,9 @@ public class WebSocketModel extends ElementModel<Object, WebSocketEventData> {
                 ws = context == null ? null : context.getService(getElementReference());
                 if (ws != null) {
                     c = ws.getClass();
+                    LOG.info("WebSocket endpoint class resolved from service: {}", c);
                 } else {
-                    throw new IllegalArgumentException("Can't determine the Web Socket endpoint path. Service reference returned null.");
+                    LOG.warn("Can't determine the Web Socket endpoint path. Service reference returned null.");
                 }
             } finally {
                 if (ws != null) {
