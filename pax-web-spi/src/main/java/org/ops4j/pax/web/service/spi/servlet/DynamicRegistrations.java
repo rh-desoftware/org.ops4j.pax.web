@@ -35,6 +35,7 @@ import org.ops4j.pax.web.service.spi.model.elements.ElementModel;
 import org.ops4j.pax.web.service.spi.model.elements.EventListenerModel;
 import org.ops4j.pax.web.service.spi.model.elements.FilterModel;
 import org.ops4j.pax.web.service.spi.model.elements.ServletModel;
+import org.ops4j.pax.web.service.spi.model.elements.WebSocketModel;
 import org.ops4j.pax.web.service.spi.model.views.DynamicJEEWebContainerView;
 import org.ops4j.pax.web.service.spi.servlet.dynamic.DynamicEventListenerRegistration;
 import org.ops4j.pax.web.service.spi.servlet.dynamic.DynamicFilterRegistration;
@@ -48,6 +49,8 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>This class may be used by container-specific classes to collect dynamic servlets/filters/listeners
@@ -59,6 +62,8 @@ import org.osgi.framework.ServiceReference;
  * context's {@link javax.servlet.ServletContainerInitializer} ends.</p>
  */
 public class DynamicRegistrations {
+
+	public static final Logger LOG = LoggerFactory.getLogger(DynamicRegistrations.class);
 
 	// --- maps for dynamic servlet/filter/listener registrations
 	//     they're populated when SCIs are invoked and actually used by the last (special) ServletContainerInitializer
@@ -315,11 +320,15 @@ public class DynamicRegistrations {
 
 		// we should never allow installation of ServletContextListeners this way
 		if (!context.acceptsServletContextListeners()) {
-			if (model.getEventListener() instanceof ServletContextListener) {
-				String message = "Section 4.4.3 of the Servlets specification allows ServletContextListeners" +
-						" to be added only by ServletContainerInitializers, declared in web.xml or web-fragment.xml or" +
-						" by discovery of @WebListener annotated classes";
-				throw new UnsupportedOperationException(message);
+			if (model.getEventListener() instanceof ServletContextListener ) {
+				if(SCIWrapper.isStartupArmed()) {
+					LOG.info("Allow registration of ServletContextListeners because SCIWrapper startup is armed.");
+				} else {
+					String message = "Section 4.4.3 of the Servlets specification allows ServletContextListeners" +
+							" to be added only by ServletContainerInitializers, declared in web.xml or web-fragment.xml or" +
+							" by discovery of @WebListener annotated classes (model = " + model.getClass().getName() + ", eventListener=" + model.getEventListener().getClass().getName() + ")";
+					throw new UnsupportedOperationException(message);
+				}
 			}
 		}
 

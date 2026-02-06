@@ -21,11 +21,15 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
 import org.ops4j.pax.web.service.spi.model.elements.ContainerInitializerModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ServletContainerInitializer} that calls actual SCI with different {@link ServletContext}
  */
 public class SCIWrapper implements ServletContainerInitializer, Comparable<SCIWrapper> {
+
+	public static final Logger LOG = LoggerFactory.getLogger(DynamicRegistrations.class);
 
 	private final OsgiDynamicServletContext context;
 	private final ContainerInitializerModel model;
@@ -40,15 +44,31 @@ public class SCIWrapper implements ServletContainerInitializer, Comparable<SCIWr
 	 * @throws ServletException
 	 */
 	public void onStartup() throws ServletException {
-		model.getContainerInitializer().onStartup(model.getClasses(), context);
+		STARTUP_ARMED.set(Boolean.TRUE);
+		try {
+			model.getContainerInitializer().onStartup(model.getClasses(), context);
+		} finally {
+			STARTUP_ARMED.set(Boolean.FALSE);
+		}
 		context.rememberAttributesFromSCIs();
 	}
+
+	private static final ThreadLocal<Boolean> STARTUP_ARMED = ThreadLocal.withInitial(() -> Boolean.FALSE);
 
 	@Override
 	public void onStartup(Set<Class<?>> c, ServletContext ctx) throws ServletException {
 		// just call with different context - the "ctx" parameter is a delegate inside
 		// this.context (org.ops4j.pax.web.service.spi.servlet.OsgiServletContext.containerServletContext)
-		model.getContainerInitializer().onStartup(c, context);
+		STARTUP_ARMED.set(Boolean.TRUE);
+		try {
+			model.getContainerInitializer().onStartup(c, context);
+		} finally {
+			STARTUP_ARMED.set(Boolean.FALSE);
+		}
+	}
+
+	public static boolean isStartupArmed() {
+		return STARTUP_ARMED.get().booleanValue();
 	}
 
 	public ContainerInitializerModel getModel() {
