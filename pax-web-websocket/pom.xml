@@ -29,7 +29,7 @@
 
 	<groupId>org.ops4j.pax.web</groupId>
 	<artifactId>pax-web-websocket</artifactId>
-	<version>8.0.33-DEPATCH_ISSUE_2135</version>
+	<version>8.0.33.1-DEPATCH_ISSUE_2135</version>
 	<packaging>bundle</packaging>
 
 	<name>OPS4J Pax Web - WebSocket support</name>
@@ -72,6 +72,12 @@
 	<dependencies>
 
 		<!-- pax-web own artifacts -->
+		<dependency>
+			<groupId>org.ops4j.pax.web</groupId>
+			<artifactId>pax-web-api</artifactId>
+			<version>8.0.33</version>
+			<scope>provided</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>org.ops4j.pax.web</groupId>

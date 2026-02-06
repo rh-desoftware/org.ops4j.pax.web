@@ -29,9 +29,14 @@
 
 	<groupId>org.ops4j.pax.web</groupId>
 	<artifactId>pax-web-spi</artifactId>
+	<version>8.0.33.1-DEPATCH_ISSUE_2135</version>
 	<packaging>bundle</packaging>
 
 	<name>OPS4J Pax Web - Service SPI (internal)</name>
+
+	<properties>
+		<pax-web.osgi.version>8.0.33</pax-web.osgi.version>
+	</properties>
 
 	<build>
 		<plugins>
@@ -154,6 +159,7 @@
 		<dependency>
 			<groupId>org.ops4j.pax.web</groupId>
 			<artifactId>pax-web-api</artifactId>
+			<version>8.0.33</version>
 		</dependency>
 
 		<!-- OSGi -->
